@@ -29,7 +29,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
         // TextFieldにdescription表示
         textController.text = todo!.description;
       } else {
-        // TODO: 該当するタスクがない場合はHomePageへ
+        // 遷移中にbuildが走るとエラーが出るので最初のフレームが描画されてから
+        // WidgetsBinding.instance!.addPostFrameCallback((_) {
+        //   Get.offNamed('/home');
+        // });
       }
     }
   }
@@ -45,7 +48,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
     return Scaffold(
       appBar: AppBar(
         // 既存編集ならID、新規作成なら「新規タスク」と表示
-        title: Text('id: ${(todo?.id ?? '新規タスク')}'),
+        title: Text('id: ${(todo?.id ?? 'new_todo'.tr)}'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15),
@@ -57,8 +60,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 TextField(
                   controller: textController,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: 'タスク入力',
+                  decoration: InputDecoration(
+                    hintText: 'your_plan'.tr,
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
                   ),
@@ -71,16 +74,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ActionButton(
-                  label: 'キャンセル',
+                  label: 'cancel'.tr,
                   icon: Icons.cancel,
                   color: Colors.grey,
                   onPressed: () {
-                    // TODO:ブラウザから直接アクセスした場合に対応
                     Get.back();
                   },
                 ),
                 ActionButton(
-                  label: todo == null ? '追加' : '更新',
+                  label: todo == null ? 'add'.tr : 'update'.tr,
                   icon: Icons.check,
                   color: Theme.of(context).colorScheme.secondary,
                   onPressed: () {
@@ -90,7 +92,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     } else if (todo != null) {
                       todoController.updateText(text, todo!); // 既存更新
                     }
-                    // TODO:ブラウザから直接アクセスした場合に対応
                     Get.back();
                   },
                 ),

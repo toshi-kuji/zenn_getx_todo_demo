@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_todo_demo/controllers/todo_controller.dart';
 
+import '../controllers/filter_controller.dart';
 import 'action_button.dart';
 import 'todo_tile.dart';
 
@@ -10,6 +11,7 @@ class TodoList extends StatelessWidget {
 
   // HomePageでputしたControllerインスタンスを探す
   final todoController = Get.find<TodoController>();
+  final filterController = Get.find<FilterController>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class TodoList extends StatelessWidget {
                 itemCount: todos.length,
                 itemBuilder: (context, index) {
                   final todo = todos[index];
-                  return TodoTile(todo: todo);
+                  return TodoTile(key: Key(todo.id), todo: todo);
                 },
               );
             },
@@ -34,17 +36,17 @@ class TodoList extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ActionButton(
-                label: '完了削除',
+                label: 'delete_done'.tr,
                 icon: Icons.delete,
                 color: Colors.grey,
                 onPressed: () {
-                  // TODO: フィルタが解除されていて、一つでも完了タスクがある場合のみ動作させる
-                  // TODO: 削除確認用のバナーを表示させる
-                  todoController.deleteDone();
+                  if (!filterController.hideDone) {
+                    todoController.deleteDone();
+                  }
                 },
               ),
               ActionButton(
-                label: '新規作成',
+                label: 'add_new'.tr,
                 icon: Icons.add,
                 color: Theme.of(context).colorScheme.secondary,
                 onPressed: () => Get.toNamed('/todo'),

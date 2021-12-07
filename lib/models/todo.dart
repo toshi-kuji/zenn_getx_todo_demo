@@ -51,6 +51,15 @@ class Todo {
     });
   }
 
+  factory Todo.fromJson(String json) {
+    final mapData = jsonDecode(json);
+    return Todo.withId(
+      id: mapData['id'] as String,
+      description: mapData['text'] as String,
+      done: mapData['done'] as bool,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

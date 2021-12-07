@@ -29,7 +29,6 @@ class TodoTile extends StatelessWidget {
       ),
       trailing: IconButton(
         onPressed: () {
-          // TODO:削除確認用のバナーを表示させる
           Get.find<TodoController>().remove(todo);
         },
         icon: const Icon(Icons.delete),

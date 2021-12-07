@@ -1,16 +1,56 @@
 import 'package:get/get.dart';
 import 'package:getx_todo_demo/models/todo.dart';
 
+import '../services/storage_service.dart';
+import 'filter_controller.dart';
+
 class TodoController extends GetxController {
   final _todos = <Todo>[].obs;
+
+  final _storage = TodoStorage();
+  late final Worker _worker;
 
   @override
   void onInit() {
     super.onInit();
-    _todos.addAll(Todo.initialTodos);
+    final storageTodos =
+        _storage.load()?.map((json) => Todo.fromJson(json)).toList();
+    // SharedPreferencesにデータがなければダミー初期データをロード
+    final initialTodos = storageTodos ?? Todo.initialTodos;
+    _todos.addAll(initialTodos);
+
+    // _todosに変化がある度にストレージに保存
+    _worker = ever<List<Todo>>(_todos, (todos) {
+      final data = todos.map((e) => e.toJson()).toList();
+      _storage.save(data);
+    });
   }
 
-  List<Todo> get todos => _todos; // TODO:フィルタの状態によって返すTodoを変える
+  @override
+  void onClose() {
+    _worker.dispose();
+    super.onClose();
+  }
+
+  // FilterControllerの状態次第で表示タスクを変更
+  List<Todo> get todos {
+    final hideDone = Get.find<FilterController>().hideDone;
+    if (hideDone) {
+      return _todos.where((todo) => todo.done == false).toList();
+    } else {
+      return _todos;
+    }
+  }
+
+  // 未完了タスクの数取得
+  int get countUndone {
+    return _todos.fold<int>(0, (acc, todo) {
+      if (!todo.done) {
+        acc++;
+      }
+      return acc;
+    });
+  }
 
   // IDからTodoを取得
   Todo? getTodoById(String id) {
